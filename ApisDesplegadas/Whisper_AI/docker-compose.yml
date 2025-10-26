@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  whisper-api:
+    build: .
+    ports:
+      - "8001:8001"
+    volumes:
+      # Opcional: montar un volumen para persistir modelos descargados
+      - whisper_models:/root/.cache/whisper
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+
+volumes:
+  whisper_models:

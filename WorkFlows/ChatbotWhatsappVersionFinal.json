@@ -1,0 +1,1208 @@
+{
+  "name": "ChatbotWhatsappVersionFinal",
+  "nodes": [
+    {
+      "parameters": {
+        "model": "gpt-5-chat",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -944,
+        1500
+      ],
+      "id": "7795bdcf-76a9-474e-b27e-ff950e93d233",
+      "name": "Azure OpenAI Chat Model7",
+      "credentials": {
+        "azureOpenAiApi": {
+          "id": "lvl3XQGNdQ8nxLZ5",
+          "name": "Azure Open AI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "reglamento",
+          "mode": "list",
+          "cachedResultName": "reglamento"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        -1232,
+        1500
+      ],
+      "id": "3433616d-7792-45b0-a78d-33fe107a757c",
+      "name": "Pinecone Vector Store4",
+      "credentials": {
+        "pineconeApi": {
+          "id": "Ah4wh9bhEj5FcHLX",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Realiza una búsqueda exhaustiva en mi vector store para encontrar y extraer toda la información disponible y pertinente relacionada con el reglamento escolar. Verifica que la información de agente Reglamento sea 100% veraz y recuperada de la vector store"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1.1,
+      "position": [
+        -1128,
+        1292
+      ],
+      "id": "92db5b8d-4280-4e8d-afba-03e9e4fbd10c",
+      "name": "Answer questions with a vector store"
+    },
+    {
+      "parameters": {
+        "model": "gpt-5-chat",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -1256,
+        1292
+      ],
+      "id": "15e049b9-5455-4227-b34b-57dfe7e6e591",
+      "name": "Azure OpenAI Chat Model6",
+      "credentials": {
+        "azureOpenAiApi": {
+          "id": "lvl3XQGNdQ8nxLZ5",
+          "name": "Azure Open AI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {
+          "systemMessage": "### Instrucciones:\",\n    \"1. Analiza cuidadosamente el **contexto** que se te proporciona (texto, documentos, fragmentos, etc.).\",\n    \"2. Compara dicho contexto con la **respuesta a verificar**.\",\n    \"3. Evalúa si la respuesta es completamente precisa, coherente y respaldada por el contexto.\",\n    \"\",\n    \"### Criterios de evaluación:\",\n    \"- **Verdadero (100%)**: Toda la información es exacta y coincide con el contexto.\",\n    \"- **Parcialmente verdadero o falso**: Contiene errores, omisiones o afirmaciones no sustentadas.\",\n    \"\",\n    \"### Output esperado:\",\n    \"- Si la respuesta es **100% verdadera**, devuelve **exactamente** el texto del *Agente Reglamento* sin modificarlo.\",\n    \"- Si la respuesta **no es 100% veraz**, crea una **versión corregida** usando solo información verdadera del contexto, manteniendo en lo posible el tono y estructura original.\",\n    \"\",\n    \"### Formato de salida:\",\n    \"- Si es veraz: ` Verificado` seguido del texto del Agente Reglamento.\",\n    \"- Si fue corregido: ` Corregido` seguido de la versión ajustada.\",\n    \"\",\n    \"### Ejemplo:\",\n    \"**Contexto:** JADE es un framework de Java para sistemas multiagente.\",\n    \"**Respuesta a verificar:** JADE es un framework de Python para crear agentes inteligentes.\",\n    \"**Salida:** Corregido: JADE es un framework desarrollado en Java que permite la creación de sistemas multiagente.\"\n  ]\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -1224,
+        1068
+      ],
+      "id": "fd947d97-23a3-4223-babe-ac2f94bee543",
+      "name": "Agente Verificador"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "Eres asistente y trabajas para la universidad autonoma del estado de hidalgo. Ayudas al usuario a navegar por el reglamento escolar. Tu objetivo es responder preguntas correspondientes al reglamento escolar, responder únicamente con información extraída del vector store.\n\nIntenta responder a todas las preguntas con hechos. Si no sabes la respuesta o no puedes obtener la información del vector store, comunicaselo al usuario."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -704,
+        252
+      ],
+      "id": "d8ed3a65-99bf-4824-a455-404d61d88443",
+      "name": "AgenteRAG"
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-large",
+        "options": {
+          "dimensions": 1024
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -632,
+        892
+      ],
+      "id": "0183c0bf-cb33-4d01-b40b-73488cf89f55",
+      "name": "Embeddings Azure OpenAI1",
+      "credentials": {
+        "azureOpenAiApi": {
+          "id": "lvl3XQGNdQ8nxLZ5",
+          "name": "Azure Open AI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "gpt-5-chat",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -424,
+        684
+      ],
+      "id": "8b2f8e1f-7364-4c4a-bde4-a094a34cf252",
+      "name": "Azure OpenAI Chat Model3",
+      "credentials": {
+        "azureOpenAiApi": {
+          "id": "lvl3XQGNdQ8nxLZ5",
+          "name": "Azure Open AI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "reglamentoservicio",
+          "mode": "list",
+          "cachedResultName": "reglamentoservicio"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        -712,
+        684
+      ],
+      "id": "cf36f47c-db34-4676-9c81-400a593da149",
+      "name": "Pinecone Vector Store1",
+      "credentials": {
+        "pineconeApi": {
+          "id": "Ah4wh9bhEj5FcHLX",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Realiza una búsqueda exhaustiva en mi vector store para encontrar y extraer toda la información disponible y pertinente relacionada con el REGLAMENTO DE SERVICIO SOCIAL Y PRÁCTICAS PROFESIONALES. Organiza y presenta los hallazgos de manera clara."
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1.1,
+      "position": [
+        -608,
+        476
+      ],
+      "id": "cc0ba133-d55e-449f-b8bd-bee75cdd50eb",
+      "name": "Answer questions with a vector store1"
+    },
+    {
+      "parameters": {
+        "model": "gpt-5-chat",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -736,
+        476
+      ],
+      "id": "f39c529b-d2ce-4bcd-8e3b-780696cbf4fe",
+      "name": "Azure OpenAI Chat Model",
+      "credentials": {
+        "azureOpenAiApi": {
+          "id": "lvl3XQGNdQ8nxLZ5",
+          "name": "Azure Open AI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Realiza una búsqueda exhaustiva en mi vector store para encontrar y extraer toda la información disponible y pertinente relacionada con el reglamento escolar. Organiza y presenta los hallazgos de manera clara."
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1.1,
+      "position": [
+        -1648,
+        1292
+      ],
+      "id": "858d75ce-cab7-4e98-9934-6ce40ad50ae4",
+      "name": "Base de Conocimiento de Reglamento de la Universidad"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.text }}",
+        "options": {
+          "systemMessage": "Eres asistente y trabajas para la universidad autonoma del estado de hidalgo. Ayudas al usuario a navegar por el reglamento escolar. Tu objetivo es responder preguntas correspondientes al reglamento escolar, responder únicamente con información extraída del vector store.\n\nIntenta responder a todas las preguntas con hechos. Si no sabes la respuesta o no puedes obtener la información del vector store, díselo al usuario."
+        }
+      },
+      "id": "549432fc-7922-4cb9-935d-8e166ccdda35",
+      "name": "Agente de Reglamento",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        -1744,
+        1068
+      ],
+      "typeVersion": 1.6
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://convert1013.salmongrass-d848b661.eastus.azurecontainerapps.io/convert/",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        584,
+        336
+      ],
+      "id": "595c99a3-f8ec-4cbc-933e-5803e072ad38",
+      "name": "Subir audio a Convertidor ogg"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://ttsfn.salmongrass-d848b661.eastus.azurecontainerapps.io/clone-voice/",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{ $json.text }}"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "audio_file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        360,
+        336
+      ],
+      "id": "217cb3fd-e3af-4779-a6f1-3ffa4e4f2b72",
+      "name": "Clonación de voz usando el modelo XTTS"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        136,
+        336
+      ],
+      "id": "3e17f499-eaec-43a5-821d-e3bf529218ed",
+      "name": "Unir Ambos Outputs necesarios para solicitar a la API"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "resume el texto lo mejor posible sin perder la idea principal\nimportante: No abrevies a \"UAEH\" y no excedas los 239 caracteres"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        -216,
+        564
+      ],
+      "id": "a35ba637-3d9a-4fce-8dd6-746d3d1c4885",
+      "name": "Resumir OutPut de Agente "
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://whisper.salmongrass-d848b661.eastus.azurecontainerapps.io/transcribe/",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1108,
+        564
+      ],
+      "id": "984f43ac-1c0a-49ab-a4a3-675677c76d60",
+      "name": "Transcribir Audio a Texto con Whisper ai",
+      "retryOnFail": true,
+      "maxTries": 2
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-large",
+        "options": {
+          "dimensions": 1024
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -1672,
+        1708
+      ],
+      "id": "c541f091-a6ef-4143-8e02-6b207367efff",
+      "name": "Embeddings Azure OpenAI",
+      "credentials": {
+        "azureOpenAiApi": {
+          "id": "lvl3XQGNdQ8nxLZ5",
+          "name": "Azure Open AI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "reglamento",
+          "mode": "list",
+          "cachedResultName": "reglamento"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        -1752,
+        1500
+      ],
+      "id": "4476c617-7a1b-4c49-9565-c0cdb08cf32e",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "Ah4wh9bhEj5FcHLX",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "gpt-5-chat",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -1464,
+        1500
+      ],
+      "id": "5c7c1c68-11e1-4eac-93d9-c25ee4f58f3b",
+      "name": "Azure OpenAI Chat Model1",
+      "credentials": {
+        "azureOpenAiApi": {
+          "id": "lvl3XQGNdQ8nxLZ5",
+          "name": "Azure Open AI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.media.mimetype }}",
+                    "rightValue": "audio/ogg",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "32993800-0edf-42c0-8fb9-9b731bb18116"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "5bc8fab4-59b7-4825-8edd-8c7425dad008",
+                    "leftValue": "={{ $json.body.type }}",
+                    "rightValue": "chat",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -2000,
+        588
+      ],
+      "id": "de15e134-756c-4124-b615-d1ccac17727f",
+      "name": "Message handling"
+    },
+    {
+      "parameters": {
+        "model": "gpt-5-chat",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -1776,
+        1292
+      ],
+      "id": "68a608b0-528a-4226-ab7b-f6737c216c4b",
+      "name": "Azure OpenAI Chat Model2",
+      "credentials": {
+        "azureOpenAiApi": {
+          "id": "lvl3XQGNdQ8nxLZ5",
+          "name": "Azure Open AI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -2560,
+        592
+      ],
+      "id": "2e59a568-0085-455e-8d2b-a85c3b7eafeb",
+      "name": "Webhook",
+      "webhookId": "107311d2-5ec7-4d49-ae4d-f37a240aa544"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://base641310.salmongrass-d848b661.eastus.azurecontainerapps.io/decode-audio",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"base64_data\": \"{{ $json.body.media.base64 }}\",\n  \"filename\": \"data.wav\"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1628,
+        336
+      ],
+      "id": "ea7f7d87-73a2-4753-a5b0-679f12d576d1",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "model": "gpt-5-chat",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        788
+      ],
+      "id": "8d1fb3a5-bb34-47ba-949c-bc44e6f4d71e",
+      "name": "Azure OpenAI Chat Model8",
+      "credentials": {
+        "azureOpenAiApi": {
+          "id": "lvl3XQGNdQ8nxLZ5",
+          "name": "Azure Open AI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://wts.salmongrass-d848b661.eastus.azurecontainerapps.io/send",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"to\": \"{{ $json.posfix }}\",\n  \"type\": \"text\",\n  \"text\": \"{{ $json.message }}\"\n  \n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -152,
+        1068
+      ],
+      "id": "97a86d24-ce9d-42c7-9e68-14cf854f919d",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "jsCode": "let number = $('Webhook').first().json.body.from\nlet posfix = number.replace(\"@c.us\", \" \")\nlet outputAgent= $input.first().json.output\nlet message = outputAgent.replaceAll(\"\\n\", \" \")\n\n\nreturn{\n  posfix,\n  message\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -588,
+        1068
+      ],
+      "id": "c312c132-41c7-40cd-9e5c-41333fc6a5ec",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://wts.salmongrass-d848b661.eastus.azurecontainerapps.io/send",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"to\": \"{{ $('Webhook').item.json.body.from }}\",\n    \"type\": \"audio\",\n    \"media\": {\n        \"mimetype\": \"audio/ogg\",\n        \"base64\": \"{{ $json.base64_data }}\",\n        \"filename\": \"data\"\n    }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1032,
+        240
+      ],
+      "id": "2248e569-4c42-469c-9934-479db855fb99",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://base641310.salmongrass-d848b661.eastus.azurecontainerapps.io/encode-audio",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        808,
+        336
+      ],
+      "id": "a9a57626-0012-4012-b448-2699303b4072",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://wts.salmongrass-d848b661.eastus.azurecontainerapps.io/send",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"to\": \"{{ $('Webhook').item.json.body.from }}\",\n  \"type\":\"text\",\n  \"text\":\"{{ $('Transcribir Audio a Texto con Whisper ai').item.json.text }}\"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1032,
+        432
+      ],
+      "id": "17bc295a-826e-471b-9d41-0df395531e8b",
+      "name": "HTTP Request4"
+    },
+    {
+      "parameters": {
+        "content": "# Resumen Rama VOZ\n**WhatsApp → RAG Reglamento + TTS**\n\n- Entrada: Webhook consumido por **NestJS + Puppeteer**.\n- Si es **audio/ogg**: decode → *Whisper* (transcribe) → RAG (Servicio Social).\n- Si es **texto**: RAG (Reglamento Escolar).\n- **Verificador** valida la veracidad contra Pinecone.\n- **Resumen** ≤ 239 caracteres, sin abreviar el nombre de la universidad.\n- **Salida** por servicio `wts.send` (texto) \n",
+        "height": 300,
+        "width": 648
+      },
+      "id": "e4feac3a-6ccd-4eb1-bfac-c385b433b77b",
+      "name": "Sticky Note (Overview)",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1488,
+        -352
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Webhook (WhatsApp)\n- Recibe `type` (`chat` | `audio`) y metadatos (`from`, `media.base64`, `media.mimetype`).\n- Este endpoint lo invoca tu **NestJS** (usa **Puppeteer**) ✔️\n- Asegura HTTPS + firma/autenticación si aplica.",
+        "height": 260,
+        "width": 420
+      },
+      "id": "524032fb-0e03-4a89-afaa-412ffa22b336",
+      "name": "Sticky Note (Webhook)",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2704,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Rama Audio (audio/ogg)\n1) `decode-audio`: Base64 → WAV  \n2) `transcribe`: **Whisper** → texto  \nPasa el texto a **RAG Servicio Social**.\n**Tips:** valida `media.mimetype` y existencia de `media.base64`.",
+        "height": 300,
+        "width": 460
+      },
+      "id": "72dc0522-6a4b-4100-8507-25083d91cbc4",
+      "name": "Sticky Note (Audio)",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1810,
+        196
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Rama Texto (chat)\n- Si `type=chat`, brinca transcripción.  \n- Pasa directo a **RAG Reglamento Escolar**.",
+        "height": 220,
+        "width": 420
+      },
+      "id": "a01dc51c-f953-4520-afd9-94c74f849e2d",
+      "name": "Sticky Note (Texto)",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2368,
+        1360
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Agente de Reglamento (Escolar)\n- Usa **Azure OpenAI Chat** + **Pinecone** (`reglamento`).\n- Responde _solo_ con contexto recuperado; si no hay, dilo.\n- Mantén tono claro y preciso.",
+        "height": 248,
+        "width": 460
+      },
+      "id": "e900d0bc-a597-488b-989f-d4402491558a",
+      "name": "Sticky Note (RAG Escolar)",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1904,
+        896
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## AgenteRAG (Servicio Social)\n- **Azure OpenAI Chat** + **Pinecone** (`reglamentoservicio`).\n- Limita la respuesta a lo almacenado en su base de conocimiento.\n- Útil para Servicio Social / Prácticas.",
+        "height": 280,
+        "width": 460
+      },
+      "id": "14273a96-bab5-45a2-9748-e62d59316c86",
+      "name": "Sticky Note (RAG Servicio)",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -822,
+        132
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Agente Verificador\n- Compara **Respuesta** vs **Contexto**.\n- Si es 100% verdadero → etiqueta **Verificado** y devuelve.\n- Si no, **corrige** y devuelve versión sustentada.",
+        "height": 240,
+        "width": 420
+      },
+      "id": "f6dfb705-1ec2-40ca-a300-f493e8eba3b0",
+      "name": "Sticky Note (Verificador)",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1328,
+        896
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Resumen para WhatsApp\n- Máximo **239** caracteres.\n- No abreviar el nombre de la universidad.\n- Quita saltos innecesarios; deja mensaje listo para envío.",
+        "height": 240,
+        "width": 420
+      },
+      "id": "129e831b-1faa-4c72-8d45-f81141a7fffc",
+      "name": "Sticky Note (Resumen)",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        256,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## TTS \n- `clone-voice` (**XTTS**) → WAV\n- `encode-audio` → OGG\n- Enviar como `type: \"audio\"`, `mimetype: \"audio/ogg\"`.\n",
+        "height": 260,
+        "width": 420
+      },
+      "id": "c099070d-8ded-4d74-9c91-9ed66d321693",
+      "name": "Sticky Note (TTS)",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        832,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Envío WhatsApp (wts.send)\n- `POST /send` → `{ to, type, text | media.base64, mimetype }`\n- `to`: normalizado a partir de `from` del Webhook.\n- Maneja errores/transitorios con reintentos.",
+        "height": 240,
+        "width": 420
+      },
+      "id": "7cee1880-be48-4538-b67c-9152821ff8ae",
+      "name": "Sticky Note (WhatsApp Send)",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        1232
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## CODE\n- Formatea correctamente el cuerpo de la solicitus, eliminando saltos de linea y el sufijo del numero, asi evitando errores de sintaxix",
+        "height": 240,
+        "width": 420
+      },
+      "id": "6efa8435-274b-4d98-bfc2-9f1a191cac13",
+      "name": "Sticky Note (WhatsApp Send)1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -736,
+        1200
+      ]
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "connection": "upgrade",
+            "host": "az-n8n444.duckdns.org",
+            "x-real-ip": "20.231.246.253",
+            "x-forwarded-for": "20.231.246.253",
+            "x-forwarded-proto": "https",
+            "content-length": "238",
+            "accept": "application/json, text/plain, */*",
+            "content-type": "application/json",
+            "user-agent": "axios/1.11.0",
+            "accept-encoding": "gzip, compress, deflate, br"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "platform": "whatsapp-web.js",
+            "from": "11111111@c.us",
+            "to": "server@c.us",
+            "timestamp": 1760426331,
+            "type": "chat",
+            "id": "fake_1760426331222",
+            "fromMe": false,
+            "raw": {
+              "ack": 1,
+              "deviceType": "web"
+            },
+            "text": "Puedes orientarme sobre tus funcionalidades"
+          },
+          "webhookUrl": "https://az-n8n444.duckdns.org/webhook/whatsapp",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Azure OpenAI Chat Model7": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store4": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Answer questions with a vector store": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente Verificador",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Azure OpenAI Chat Model6": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente Verificador",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente Verificador": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AgenteRAG": {
+      "main": [
+        [
+          {
+            "node": "Resumir OutPut de Agente ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Azure OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Azure OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Answer questions with a vector store1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store1": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Answer questions with a vector store1",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Answer questions with a vector store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AgenteRAG",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Azure OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AgenteRAG",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Base de Conocimiento de Reglamento de la Universidad": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente de Reglamento",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente de Reglamento": {
+      "main": [
+        [
+          {
+            "node": "Agente Verificador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Subir audio a Convertidor ogg": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clonación de voz usando el modelo XTTS": {
+      "main": [
+        [
+          {
+            "node": "Subir audio a Convertidor ogg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unir Ambos Outputs necesarios para solicitar a la API": {
+      "main": [
+        [
+          {
+            "node": "Clonación de voz usando el modelo XTTS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resumir OutPut de Agente ": {
+      "main": [
+        [
+          {
+            "node": "Unir Ambos Outputs necesarios para solicitar a la API",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Transcribir Audio a Texto con Whisper ai": {
+      "main": [
+        [
+          {
+            "node": "AgenteRAG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Azure OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store4",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Base de Conocimiento de Reglamento de la Universidad",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Azure OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Base de Conocimiento de Reglamento de la Universidad",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message handling": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Agente de Reglamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Azure OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente de Reglamento",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Message handling",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Transcribir Audio a Texto con Whisper ai",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Unir Ambos Outputs necesarios para solicitar a la API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Azure OpenAI Chat Model8": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Resumir OutPut de Agente ",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5c8823bf-e824-48be-a5f4-59b128de6774",
+  "meta": {
+    "instanceId": "3fcc644d9e9b7920e96094707a8751586188d150285dff7512ebe15f04af2b87"
+  },
+  "id": "vXU0NoIrzLZmYrC4",
+  "tags": []
+}

@@ -1,0 +1,286 @@
+{
+  "name": "MessengerV1",
+  "nodes": [
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "20ff8033-3a47-433b-afcb-4ee1ebf08bdb",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1296,
+        0
+      ],
+      "id": "fe4468a8-a7ee-4b80-8998-8338b1a412f2",
+      "name": "Webhook",
+      "webhookId": "20ff8033-3a47-433b-afcb-4ee1ebf08bdb"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a63de041-a3a7-48f1-bdf7-ead3eae1b8c0",
+              "leftValue": "={{ $json.query['hub.mode'] }}",
+              "rightValue": "subscribe",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "fcc44bbc-4e2d-40e1-bbd5-809e3c8465ff",
+              "leftValue": "={{ $json.query['hub.verify_token'] }}",
+              "rightValue": "aichatbot",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -976,
+        -64
+      ],
+      "id": "a859a691-01aa-465b-ac6f-edde49b6366d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $('Webhook').item.json.query['hub.challenge'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.3,
+      "position": [
+        -768,
+        -160
+      ],
+      "id": "d3eeb0df-51c4-4749-9a34-7091a488f78a",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.entry[0].messaging[0].message.text }}",
+        "options": {
+          "systemMessage": "Eres un asistente virtual para un compañia de venta de equipo electronico, responde las preguntas de los clientes y verifica el stock de los componentes en la bd"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -976,
+        144
+      ],
+      "id": "f9a34ee4-19b3-4305-bb49-c56e545294c2",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514",
+          "cachedResultName": "Claude 4 Sonnet"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        -1056,
+        352
+      ],
+      "id": "799b3689-68a7-453f-8ebe-5a57282850b6",
+      "name": "Anthropic Chat Model"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Search records in Airtable",
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "app0VvEYsa08OAdxB",
+          "mode": "list",
+          "cachedResultName": "Engineering Components Database",
+          "cachedResultUrl": "https://airtable.com/app0VvEYsa08OAdxB"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbliCqXPtE7bezXLv",
+          "mode": "list",
+          "cachedResultName": "Componentes Electronicos",
+          "cachedResultUrl": "https://airtable.com/app0VvEYsa08OAdxB/tbliCqXPtE7bezXLv"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -784,
+        320
+      ],
+      "id": "45be22eb-2360-4580-8b91-382ed1d19d08",
+      "name": "Airtable"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.entry[0].messaging[0].sender.id }}",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -928,
+        352
+      ],
+      "id": "6a5bf010-c8eb-4225-89f1-74e670275dd9",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v21.0/me/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAA4MXtmfHmABOZCbEyJK0nuB5FUb5YaZA011QPGkZAWTsYWiL0kaM3O6ctIPsbTyWZB0494FVbqclD0GrtxaxBHr0r1olLOmEVDVLnTJFb6yQpbp4m4YZAzSgpYO39f7WrTBupJcW8pwHvLNDg8JGz1s5S9sXc0ecnEthlcBjaBUcVaNYZB7lSghUod6ryjUToJRcYp4EbvBLFnXsnjsaSEgZBLogZDZD"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "={\"text\":\"{{ $json.output }}\"}"
+            },
+            {
+              "name": "recipient",
+              "value": "{\"id\":\"30443127945278392\"}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -624,
+        144
+      ],
+      "id": "222cddaa-0354-4744-ab16-e3371eed36eb",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ea284464-8f30-4d81-be21-0c1545bcb363",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3fcc644d9e9b7920e96094707a8751586188d150285dff7512ebe15f04af2b87"
+  },
+  "id": "RZdp4nXlkq3DFs3d",
+  "tags": []
+}

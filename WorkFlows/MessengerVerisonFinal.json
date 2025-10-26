@@ -1,0 +1,782 @@
+{
+  "name": "MessengerVerisonFinal",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "45643bf0-e122-4738-8f77-33481edabf22",
+              "leftValue": "={{ $json.query['hub.mode'] }}",
+              "rightValue": "subscribe",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "c5b80d0c-5f1a-4fc1-9483-18db82ef1115",
+              "leftValue": "={{ $json.query['hub.verify_token'] }}",
+              "rightValue": "aichatbot",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -16,
+        736
+      ],
+      "id": "7828249a-8ece-4972-9146-30689622db34",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.query['hub.challenge'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.3,
+      "position": [
+        416,
+        720
+      ],
+      "id": "10059ee9-7a48-4b40-bdf9-b1cd054192c5",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v23.0/649516201583617/messages?access_token=EAAUzt3co75YBOyQRqZB6EryEb4Yum0nTKcEpvrqPHsNfht8xIfCRClLdEZCZCQ8ZAnmRRVZAZCk7prrigLIZB6xFomHYSzZCZCDgmknaZCqZCLtl2AwFbck1wmiYsVOPsjVM734BFaVAD4eWnPnzIESTHZBxsyChS2OWWb0wfuTZBS2bu4OrtXDZAKUDgxQZAoKauaWrNTZBlSZCPgKZBMwYcxYXj8fUnKZAJAy0gZDZD",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"recipient\": {\n    \"id\": \"30443127945278392\"\n  },\n  \"messaging_type\": \"RESPONSE\",\n  \"message\": {\n    \"text\": {{ JSON.stringify($json.output )}}\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        624,
+        976
+      ],
+      "id": "8ee138ba-b59e-4d70-8da1-ef8a5a4e3869",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.entry[0].messaging[0].message.text }}",
+        "options": {
+          "systemMessage": "=Eres un asistente virtual de una empresa que vende componentes eléctricos. Tu tarea es ayudar al usuario a navegar el catálogo, ayudar al usuario a navegar el catálogo y facilitar la compra de productos exclusivamente con recogida en tienda y responder únicamente con información extraída del vector store.\n\nUsa solo la información que ha sido recuperada desde el vector store para responder.\n\nNo inventes ni supongas datos si no fueron encontrados en la búsqueda.\n\nSi no puedes encontrar una respuesta en los datos recuperados, indícalo claramente al usuario (por ejemplo: \"No tengo esa información en este momento\").\n\nMantén tus respuestas breves, claras y enfocadas en datos verificables. Si el usuario hace una pregunta ambigua, puedes pedir aclaraciones para mejorar la búsqueda en el vector store.\n\n Modalidad de compra con recogida en tienda:\n\nSi el usuario desea comprar un producto, pídele su nombre completo y que indique el estado donde desea recogerlo.\n\nBusca en el vector store las sucursales ubicadas en ese estado.\n\nSi no se encuentra ninguna sucursal, responde:\n\n\"No se encontraron sucursales disponibles en ese estado.\"\n\nSi se encuentran sucursales, muestra una lista clara con:\n\nDirección\n(extraídos del vector store)\nTeléfono\n(extraídos del vector store)\n\nPermite al usuario seleccionar una sucursal para completar el proceso de compra con recogida.\nfinalmente genera un comprobante de compra con un codigo aleatorio de 8 digitos,el resumen del pedido y su nombre \n\nSi el usuario sigue consultando despues de una compra, debes ser preciso y mostrale la informacion que pide, tu trabajo no acaba cuando el usuario realiza la compra\ntus respuestas deben ser igual o menores a 2000 caracteres"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -192,
+        976
+      ],
+      "id": "9732242f-50ec-4117-a7de-8d46608e864c",
+      "name": "Agente_chatbot"
+    },
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "fd633188-a85e-418a-af42-c9b1fbdab91f",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -688,
+        752
+      ],
+      "id": "c7051c46-15f0-460d-99f4-fdef4c16daf7",
+      "name": "Webhook",
+      "webhookId": "fd633188-a85e-418a-af42-c9b1fbdab91f",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "model": "o4-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        1056
+      ],
+      "id": "551958c8-e5e2-4c37-b056-6d199b7d0764",
+      "name": "Azure OpenAI Chat Model"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.entry[0].messaging[0].sender.id }}",
+        "collectionName": "n8n_chat_prod",
+        "databaseName": "Chat_prod",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        1152
+      ],
+      "id": "a641e3aa-5a68-49dc-817a-3364490cd841",
+      "name": "MongoDB Chat Memory"
+    },
+    {
+      "parameters": {
+        "description": "recupera la información acerca del catalogo "
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1.1,
+      "position": [
+        32,
+        1200
+      ],
+      "id": "180a5c30-51a9-49c6-a7d7-d5e5017e9fb1",
+      "name": "Answer questions with a vector store"
+    },
+    {
+      "parameters": {
+        "model": "o4-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        224,
+        1392
+      ],
+      "id": "a9a5ff70-4391-42aa-93fa-447c70098773",
+      "name": "Azure OpenAI Chat Model1"
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "catalogo",
+          "mode": "list",
+          "cachedResultName": "catalogo"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        -144,
+        1488
+      ],
+      "id": "f0efdebc-33d9-4532-82dc-fb7a8906430d",
+      "name": "Pinecone Vector Store"
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-large",
+        "options": {
+          "dimensions": 1024
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        1600
+      ],
+      "id": "8fec3651-d9ef-4f73-9a88-f97c9086a61b",
+      "name": "Embeddings Azure OpenAI"
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $json.text }}",
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        192,
+        32
+      ],
+      "id": "14c921e7-a78a-4242-ad09-345956fdc910",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkSize": 2000,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        288,
+        160
+      ],
+      "id": "53d8363b-af6c-44e9-b97f-c94c3d9ec7da",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "catalogo",
+          "mode": "list",
+          "cachedResultName": "catalogo"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        160,
+        -176
+      ],
+      "id": "c148756e-c638-4685-a782-041c0d12c7ce",
+      "name": "Pinecone Vector Store1"
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-large",
+        "options": {
+          "dimensions": 1024
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        96,
+        0
+      ],
+      "id": "54adf101-bec7-4367-ad5d-472ecf71b6ed",
+      "name": "Embeddings Azure OpenAI1"
+    },
+    {
+      "parameters": {
+        "content": "### En esta etapa, se carga un documento PDF almacenado en Google Drive, el cual contiene la información que servirá como base de conocimiento para el sistema. Una vez obtenido, el documento se divide en fragmentos o bloques de texto más pequeños, lo que facilita su procesamiento y permite una indexación más eficiente. Estos fragmentos se almacenan en Pinecone, una base de datos vectorial especializada en búsquedas semánticas, lo que permitirá realizar consultas inteligentes basadas en similitud de significado.",
+        "height": 720,
+        "width": 1180,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -768,
+        -320
+      ],
+      "id": "e0ae2ae0-b864-4cfc-8399-8170f6629964",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "### La segunda parte del flujo se enfoca en cómo funciona el chatbot con inteligencia artificial. Básicamente, este bot usa la información que ya se guardó en Pinecone para poder responder las preguntas que le haga un usuario. Cuando alguien escribe una consulta, el sistema busca en esa base de datos los fragmentos de texto más relacionados con la pregunta, y con eso genera una respuesta clara y con contexto. Así, el chatbot puede responder de forma más natural y útil, basándose en el contenido del PDF que se cargó al inicio.",
+        "height": 1240,
+        "width": 1220,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -768,
+        512
+      ],
+      "id": "3a9aa893-04a9-44fd-b8de-922eb905355e",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Este workflow se divide en dos etapas: la primera recopila e indexa los datos en la base de datos vectorial Pinecone, mientras que la segunda gestiona el funcionamiento del chatbot.",
+        "height": 280,
+        "width": 420
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1488,
+        304
+      ],
+      "id": "66536a93-80b0-4518-8a45-638deac3b22e",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -736,
+        0
+      ],
+      "id": "86628b4a-7725-46ce-9618-91e1e4e55d92",
+      "name": "Inicio del flujo de entrenamiento"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1bA8EWjXHkCgjPsgno8coK7h3cwa7GJ4t",
+          "mode": "list",
+          "cachedResultName": "catalogo.pdf",
+          "cachedResultUrl": "https://drive.google.com/file/d/1bA8EWjXHkCgjPsgno8coK7h3cwa7GJ4t/view?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -528,
+        0
+      ],
+      "id": "1fb143b5-3551-47cd-9e15-018d587608f7",
+      "name": "Cargar datos desde google drive"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        0
+      ],
+      "id": "49363f71-d291-464a-ac7b-bb14389892f6",
+      "name": "Extraer los datos cargados desde google drive"
+    },
+    {
+      "parameters": {
+        "content": "#### Este nodo se encarga de conectarse a tu cuenta de Google Drive y descargar el archivo PDF que contiene la información que deseas usar. Es el punto de entrada del flujo de trabajo, ya que obtiene el documento fuente.",
+        "height": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        192
+      ],
+      "id": "8e3fada2-45f1-4ed5-8c30-a736b91933b7",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "#### este nodo procesa el PDF y extrae su contenido en texto plano. Permite convertir el contenido no estructurado del documento en datos legibles y manipulables por los siguientes nodos.",
+        "height": 200
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        192
+      ],
+      "id": "a70c8374-b8e1-4dd0-8fcc-c7f9061c670f",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "#### Este nodo se utiliza para almacenar representaciones vectoriales del contenido extraído (es decir, los embeddings), lo que permite realizar búsquedas semánticas inteligentes. Este nodo se utiliza para almacenar representaciones vectoriales del contenido extraído (es decir, los embeddings), lo que permite realizar búsquedas semánticas inteligentes. ",
+        "height": 300,
+        "width": 280
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        496,
+        -288
+      ],
+      "id": "7d07bffe-715e-412e-8028-16e22668ffb7",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "##### Carga el contenido que proviene del extractor de PDF y lo prepara para ser dividido.",
+        "height": 80
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        448,
+        80
+      ],
+      "id": "6748958f-37c5-4534-ab66-eee19aadc1fb",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "##### Divide el texto en fragmentos más pequeños (chunks), generalmente con una lógica recursiva basada en caracteres y saltos de línea. ",
+        "height": 120
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        320,
+        304
+      ],
+      "id": "88526e2f-f1c2-4855-bf1d-251729e3c1f0",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "###### Convierte cada fragmento de texto en un vector numérico (embedding), que es una representación semántica del contenido.",
+        "height": 100
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        16,
+        144
+      ],
+      "id": "1418aeba-27d0-4a9b-8e3b-879ed9ffd262",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "#####  Punto de entrada del flujo para recibir eventos del Messenger.\n\n",
+        "height": 80
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -736,
+        656
+      ],
+      "id": "0c514273-fa9c-4458-96b1-46e023bd1673",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "##### Validación del webhook de Facebook para que el bot sea aceptado en la app.",
+        "height": 100
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        608
+      ],
+      "id": "97858a0a-c326-4c86-9b3a-9901054f5801",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "##### Completa la verificación del webhook ante Facebook.\n\n",
+        "height": 80
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        128,
+        608
+      ],
+      "id": "e1625bae-e215-4096-b641-d07bfedc4aad",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "#####  Recibe el mensaje del usuario, consulta el vector store (Pinecone), accede a la memoria en MongoDB, y genera una respuesta con OpenAI alojado en los servidores de Azure",
+        "height": 140
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        896
+      ],
+      "id": "63f85e5c-1ff6-4a0f-a8af-ff3278759d4f",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "content": "##### Envía la respuesta del chatbot de vuelta al usuario a través de la API de Facebook",
+        "height": 100
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        528,
+        880
+      ],
+      "id": "89df0cf5-be2b-47ea-a305-5e23972eb27c",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "###### Guarda el historial de conversación usando el sender.id de Facebook como sesión personalizada",
+        "height": 80
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -576,
+        1296
+      ],
+      "id": "f071bc1a-461a-4654-9867-24feb0d09718",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "content": "######  Herramienta que permite hacer consultas semánticas al vector store con base en el texto del usuario.",
+        "height": 100
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        96,
+        1168
+      ],
+      "id": "9cf64117-af10-4ce2-820f-aa4f5e8f56d8",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "content": "###### Procesa la consulta del usuario y genera respuestas utilizando los datos recuperados",
+        "height": 100
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        112,
+        1376
+      ],
+      "id": "eb294214-f74c-48cc-b619-18c1cf685785",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "content": "######  Almacena los embeddings del contenido (fragmentos del catálogo) y permite hacer búsquedas semánticas.",
+        "height": 120
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        1600
+      ],
+      "id": "fa64d7de-9d4e-40cc-bb12-ad009129ff81",
+      "name": "Sticky Note17"
+    },
+    {
+      "parameters": {
+        "content": "######  Se asegura que tanto la inserción como la consulta usen los mismos embeddings.",
+        "height": 100
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        1728
+      ],
+      "id": "82c5150b-0a85-408b-9a62-ba216b59a166",
+      "name": "Sticky Note18"
+    }
+  ],
+  "pinData": {
+    "Webhook": []
+  },
+  "connections": {
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente_chatbot": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Agente_chatbot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Azure OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente_chatbot",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MongoDB Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agente_chatbot",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Answer questions with a vector store": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente_chatbot",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Azure OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Azure OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Azure OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inicio del flujo de entrenamiento": {
+      "main": [
+        [
+          {
+            "node": "Cargar datos desde google drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cargar datos desde google drive": {
+      "main": [
+        [
+          {
+            "node": "Extraer los datos cargados desde google drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraer los datos cargados desde google drive": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "82ae0147-728d-4b75-bb00-105f5b66e90d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3fcc644d9e9b7920e96094707a8751586188d150285dff7512ebe15f04af2b87"
+  },
+  "id": "MAqFWnusSsRjbZgj",
+  "tags": []
+}

@@ -1,0 +1,16 @@
+# Variables del servidor 
+PORT=3000
+HOST=localhost 
+ 
+# URL del webhook donde enviar los mensajes recibidos 
+WEBHOOK_URL=http://ec2-50-17-199-169.compute-1.amazonaws.com:5678/webhook/fd633188-a85e-418a-af42-c9b1fbdab91f
+
+
+# Configuracion de la API REST (opcional) 
+API_KEY=tu_api_key_aqui 
+ 
+# Configuracion adicional 
+DEBUG=true 
+
+#API_ENDPOINT
+ 

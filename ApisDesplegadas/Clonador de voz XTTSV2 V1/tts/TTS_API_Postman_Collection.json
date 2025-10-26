@@ -1,0 +1,93 @@
+{
+  "info": {
+    "name": "TTS Voice Cloning API",
+    "description": "Colección de Postman para probar la API de clonación de voz TTS",
+    "version": "1.0.0"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/health",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["health"]
+        },
+        "description": "Verifica que la API esté funcionando correctamente"
+      }
+    },
+    {
+      "name": "API Info",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": [""]
+        },
+        "description": "Obtiene información general de la API"
+      }
+    },
+    {
+      "name": "Test Endpoint",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/test",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["test"]
+        },
+        "description": "Endpoint simple para probar que la API funciona"
+      }
+    },
+    {
+      "name": "Clonar Voz",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "text",
+              "value": "Hola, esta es una prueba de clonación de voz con el modelo TTS",
+              "type": "text",
+              "description": "Texto que se convertirá a audio con la voz clonada"
+            },
+            {
+              "key": "audio",
+              "type": "file",
+              "description": "Archivo de audio de referencia (.wav recomendado)",
+              "src": ""
+            }
+          ]
+        },
+        "url": {
+          "raw": "http://localhost:8000/clonar_voz",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["clonar_voz"]
+        },
+        "description": "Clona una voz usando el archivo de audio de referencia"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    }
+  ]
+}

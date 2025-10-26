@@ -1,0 +1,891 @@
+{
+  "name": "MessengerV2MongoDB",
+  "nodes": [
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "d467d963-7013-4ff6-b1bb-c1454c8330f1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -48,
+        -96
+      ],
+      "id": "191b1de7-a47f-40dd-9594-8d4563db4725",
+      "name": "Webhook",
+      "webhookId": "d467d963-7013-4ff6-b1bb-c1454c8330f1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "78d280a2-c512-40f1-b1a2-4de7171bdebd",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "aeb46cc8-f174-4f0a-b3ab-4298504b28c5",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        -240
+      ],
+      "id": "adc8550b-4b3d-4bbb-9dbf-44a5183fc859",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.query['hub.challenge'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.3,
+      "position": [
+        -2400,
+        -848
+      ],
+      "id": "0687f311-1953-4e94-abd1-addc05a50684",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.output }}",
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"Nombre\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n\t\t\"Direccion\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n        \"Telefono\": {\n             \"type\": \"string\"\n        },\n      \"Nota_de_compra\": {\n             \"type\": \"string\"\n        }\n\t}\n}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.1,
+      "position": [
+        -1776,
+        -512
+      ],
+      "id": "0313592c-9967-4a14-be1c-7a002b3e2cd0",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514",
+          "cachedResultName": "Claude 4 Sonnet"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        -1776,
+        -320
+      ],
+      "id": "c503bd8b-baf0-4d5a-a643-48aa4d49e50b",
+      "name": "Anthropic Chat Model1"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.output }}",
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"Nombre\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n\t\t\n        \"Nota de compra\": {\n          \"type\": \n  \"string\"\n        },\n      \"precio unitario\":{\n      \"type\": \n      \"string\"\n      },\n    \"cantindad\":{\n      \"type\": \"number\"\n    },\n    \"Stock Restante\": {\n      \"type\": \"number\"\n    }\n}\n}",
+        "options": {
+          "systemPromptTemplate": "Convierte a singular el nombre del producto sin alterar sus especificaciones"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.1,
+      "position": [
+        -1824,
+        -96
+      ],
+      "id": "eff5bcba-010f-485c-aa98-f679cc8aa870",
+      "name": "Information Extractor1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9aa1ab18-9020-4d3b-9329-b148cf12c180",
+              "leftValue": "={{ $json.output['Nota de compra'] }}",
+              "rightValue": "=ai",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1376,
+        -16
+      ],
+      "id": "6af4fd05-2812-48be-9056-b147a490cdaa",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-pro-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -2848,
+        -224
+      ],
+      "id": "69c2d6a7-9b3e-4d93-acc1-0d7f7b8bada0",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{\n{\n\"contents\": [\n{\n\"parts\": [\n{\n\"text\": $json.body.entry[0].messaging[0].message.text\n}\n]\n}\n]\n}\n}}",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3104,
+        -528
+      ],
+      "id": "08c881f4-ad44-4385-819c-abd7f8658b2b",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "78f1aeae-fe16-489a-9ceb-f52eb73ce62b",
+              "name": "Stock",
+              "value": "={{ $json.output[\"Stock Restante\"] }}",
+              "type": "number"
+            },
+            {
+              "id": "2416bc3b-3047-4dc9-b5c9-6d86c32bb156",
+              "name": "Cantidad",
+              "value": "={{ $json.output.cantindad }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1120,
+        -48
+      ],
+      "id": "0a32b52c-508b-4d60-a138-e2607d2ce6e3",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514",
+          "cachedResultName": "Claude 4 Sonnet"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        -1728,
+        128
+      ],
+      "id": "9dc24854-f6e7-44a7-8b37-c9b9ff9650d7",
+      "name": "Anthropic Chat Model"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "84a03327-ed2a-4102-8ac4-36fc5cb25b44",
+              "leftValue": "={{ $json.output.Nota_de_compra }}",
+              "rightValue": "ai",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1376,
+        -320
+      ],
+      "id": "8691e70f-8b49-4c42-89c4-6fa93655f0e8",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Edit Fields').item.json.body.entry[0].messaging[0].sender.id }}",
+        "databaseName": "Messenger_chatbot_history"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "typeVersion": 1,
+      "position": [
+        -2656,
+        -128
+      ],
+      "id": "1fba85cb-7eb5-4e9d-8050-15c5eacbdd19",
+      "name": "MongoDB Chat Memory"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Find all colecctions from my document Componentes when the costumer asked for the inventary",
+        "collection": "Componentes",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDbTool",
+      "typeVersion": 1.2,
+      "position": [
+        -2544,
+        -256
+      ],
+      "id": "0e4bdb59-1e80-4aef-87c3-741c2c370096",
+      "name": "consultar_stock",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "collection": "Clientes",
+        "fields": "=Nombre, Direccion, Telefono, Nota_de_compra",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        -928,
+        -368
+      ],
+      "id": "0974f3e3-d4ae-4449-8985-e9821a765c80",
+      "name": "MongoDB"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "610424d3-120e-43c9-8257-a4f94a217e44",
+              "name": "Nombre",
+              "value": "={{ $json.output.Nombre }}",
+              "type": "string"
+            },
+            {
+              "id": "d2c3efe6-633c-451b-9aeb-e95b7f31623b",
+              "name": "Direccion",
+              "value": "={{ $json.output.Direccion }}",
+              "type": "string"
+            },
+            {
+              "id": "8bc98f0b-6d52-4195-8277-813559485250",
+              "name": "Telefono",
+              "value": "={{ $json.output.Telefono }}",
+              "type": "string"
+            },
+            {
+              "id": "1ff8de15-73a2-48b9-b3ca-372125a71f74",
+              "name": "Nota_de_compra",
+              "value": "={{ $json.output.Nota_de_compra }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1136,
+        -368
+      ],
+      "id": "028bc2ae-09eb-4051-bdd2-cde0b0b1e671",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Dame el resultado de {{ $json.Stock }} - {{ $json.Cantidad }}(solo dame el resultado)",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        -928,
+        -48
+      ],
+      "id": "bbea3148-4ef1-40ce-9725-30365c307217",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514",
+          "cachedResultName": "Claude 4 Sonnet"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        -896,
+        160
+      ],
+      "id": "dcfdfffc-ec1a-4bdf-ac4c-ff5f49ce3f0c",
+      "name": "Anthropic Chat Model2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cd434f1f-3df5-44f3-a731-06e80907bf59",
+              "name": "Stock",
+              "value": "={{ $json.text }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -560,
+        -48
+      ],
+      "id": "27c70c76-2924-44d4-9a17-13b2b1e7b7c5",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "collection": "Componentes",
+        "updateKey": "Nombre",
+        "fields": "Stock",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        -64,
+        -128
+      ],
+      "id": "3a3dceb9-9781-4f8f-ba72-79d850ef9ed6",
+      "name": "MongoDB1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9134f0fc-46c1-47d2-bfaa-4ef2e097102f",
+              "name": "Nombre",
+              "value": "={{ $json.output.Nombre }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1120,
+        -176
+      ],
+      "id": "5a3bc509-6e5c-4867-be9a-3abecaf12663",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -320,
+        -128
+      ],
+      "id": "a7e6b043-b244-4787-9bdb-945b6db27530",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Edit Fields').item.json.contents[0].parts[0].text }}",
+        "options": {
+          "systemMessage": "=Eres \"ElectroBot\", un asistente de ventas experto para la tienda \"Componentes Electrónicos AItecs\". Tu tono debe ser amable, servicial y humano. Tu objetivo es guiar al cliente desde la consulta de un producto hasta la finalización de su compra de manera fluida y eficiente.\n\nInstrucciones de Operación\nSigue este flujo de conversación estrictamente:\n\nSaludo Inicial: Comienza con un saludo amigable y pregunta al cliente qué componente electrónico está buscando. No muestres todo el stock de inmediato.\nSi el usuario pregunta por inventario, stock o los componentes que se venden, \ndebes usar la herramienta consultar_stock para obtener la información real de la base de datos. \nNunca inventes datos, siempre consulta la herramienta antes de responder sobre productos o cantidades disponibles NO INVENTES DATOS.\nRespuesta Basada en Disponibilidad:\nSi hay stock suficiente: Informa al cliente que el producto está disponible, calcula y comunica el precio total (precio_unitario * cantidad). Pregúntale si desea proceder con la compra.\nSi no hay stock suficiente: Informa al cliente la cantidad exacta disponible y pregúntale si desea comprar esa cantidad o si busca otro producto.\nRecopilación de Datos: Solo después de que el cliente confirme que desea realizar la compra, pídele en un único mensaje su nombre completo, dirección de envío y número de teléfono.\nCreación de Nota de Compra: Una vez que tengas todos los datos del cliente y los detalles del pedido, Utiliza la información devuelta para presentar un resumen final al cliente. El resumen debe incluir:\nConfirmación del pedido.\nDatos del cliente que incluyan direccion, nombre y telefono\nComponentes y cantidad comprada.\nPrecio total(calculalo consultando precio en el nodo consultar_stock).\nEl código de la nota de compra(Este codigo siempre debe empezar con ai(siempre minuscula)).\nMenciona que la fecha de hoy ({{ $today }}) ha sido registrada en su nota.\nAgradece al cliente por su compra y finaliza la conversación. El proceso termina aquí.\nNo simules: Nunca actúes como si estuvieras consultando la base de datos o realizando una acción. Simplemente ejecuta la herramienta y usa el resultado que te devuelve.\nNo inventes: No proporciones información sobre precios o stock que no provenga directamente de la herramienta consultar_stock.\nSeguridad de datos: No pidas datos personales (nombre, dirección) hasta que el cliente haya confirmado su intención de comprar un producto en stock.\nProceso único: Concéntrate en vender un tipo de componente por conversación para mantener el flujo simple.\nMemoria: Al finalizar la conversación, tu memoria sobre esta interacción específica se borrará. No es necesario que lo anuncies.\nImportante: NO HAGAS SIMULACIONES NI INVENTES DATOS, TODO CONSULTALO EN EL NODO consultar_stock"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -2704,
+        -480
+      ],
+      "id": "17770949-9db6-4a34-a741-8e6aa26d910d",
+      "name": "Revisar_base_de_datos"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -2224,
+        -480
+      ],
+      "id": "15bb7917-92e4-4803-b2fa-708bf20d8ec3",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514",
+          "cachedResultName": "Claude 4 Sonnet"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        -2304,
+        -304
+      ],
+      "id": "f6ad7677-b7c0-4022-8dc3-be1be7462bf3",
+      "name": "Anthropic Chat Model3"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.5,
+      "position": [
+        -2160,
+        -240
+      ],
+      "id": "083b68e6-b683-4dac-8dc4-b5d3f7b792a3",
+      "name": "Redis Chat Memory"
+    },
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "8c246189-7f47-4fd7-ad99-6785aa199021",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -3328,
+        -624
+      ],
+      "id": "0590749c-f28e-4e26-bb6e-6e39c268bd0d",
+      "name": "Webhook1",
+      "webhookId": "8c246189-7f47-4fd7-ad99-6785aa199021"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "45643bf0-e122-4738-8f77-33481edabf22",
+              "leftValue": "={{ $json.query['hub.mode'] }}",
+              "rightValue": "subscribe",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "c5b80d0c-5f1a-4fc1-9483-18db82ef1115",
+              "leftValue": "={{ $json.query['hub.verify_token'] }}",
+              "rightValue": "=aichatbot",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2688,
+        -704
+      ],
+      "id": "01d593b1-b6ab-47f7-ba6e-b3e68a15c6e3",
+      "name": "If3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Revisar_base_de_datos",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Revisar_base_de_datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MongoDB Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Revisar_base_de_datos",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "consultar_stock": {
+      "ai_tool": [
+        [
+          {
+            "node": "Revisar_base_de_datos",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "MongoDB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "MongoDB1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revisar_base_de_datos": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d0cead74-9782-4910-8560-768e8cbe8eda",
+  "meta": {
+    "instanceId": "3fcc644d9e9b7920e96094707a8751586188d150285dff7512ebe15f04af2b87"
+  },
+  "id": "MAqFWnusSsRjbZgj",
+  "tags": []
+}

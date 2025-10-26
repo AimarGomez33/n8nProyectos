@@ -1,0 +1,593 @@
+{
+  "name": "CV",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "includeDrafts": true,
+          "readStatus": "unread"
+        },
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -3056,
+        140
+      ],
+      "id": "742bc928-95c3-4b21-bad6-2c30da9e5657",
+      "name": "Gmail Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "attachment_0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -2608,
+        44
+      ],
+      "id": "e50ad55e-e3a5-4487-b8ee-502d02c123fd",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.text }}",
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"Nombre_candidato\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n\t\t\"email\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n        \"Telefono\": {\n             \"type\": \"string\"\n        }\n\t}\n}",
+        "options": {
+          "systemPromptTemplate": "Eres un algoritmo de extracción experto. Sólo extrae información relevante del texto.\nSi no conoces el valor de un atributo que se te pide que extraigas, puedes omitirlo"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.1,
+      "position": [
+        -2384,
+        -208
+      ],
+      "id": "4b14ce50-70f1-4554-b695-ccb7ee382169",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514",
+          "cachedResultName": "Claude 4 Sonnet"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        -2312,
+        16
+      ],
+      "id": "7e51deb5-ab2b-47a7-a21e-65dd89d155a9",
+      "name": "Anthropic Chat Model"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -2032,
+        44
+      ],
+      "id": "f58ee449-5be9-4ab8-9461-4111b8946fdb",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $json.id }}",
+        "simple": false,
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -2832,
+        140
+      ],
+      "id": "b98d6cd2-c786-4363-817a-a5a2a4989743",
+      "name": "Gmail",
+      "webhookId": "d4eca696-3f9c-4f02-9f05-a20da8a8b856"
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "attachment_0",
+        "name": "={{ $json.from.value[0].address }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1S3qMq0PIcg6CQPWNoo7mnVekOTU-j3sN",
+          "mode": "list",
+          "cachedResultName": "cvs",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1S3qMq0PIcg6CQPWNoo7mnVekOTU-j3sN"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -2608,
+        236
+      ],
+      "id": "0f0247cc-0dd9-4717-86ba-55946b4df803",
+      "name": "Google Drive"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.text }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Formacion academia",
+              "description": "Resumen de su formacion academica relevante",
+              "required": true
+            },
+            {
+              "name": "Historial laboral",
+              "description": "Resumen del historial laboral",
+              "required": true
+            },
+            {
+              "name": "Habilidades",
+              "description": "Resumen de sus habilidades",
+              "required": true
+            },
+            {
+              "name": "Lenguajes de programación",
+              "description": "Resumen de los lenguajes que domina",
+              "required": true
+            },
+            {
+              "name": "Software",
+              "description": "Extrae los programas de software que domina",
+              "required": true
+            }
+          ]
+        },
+        "options": {
+          "systemPromptTemplate": "Eres un algoritmo de extracción experto. Sólo extrae información relevante del texto.\nSi no conoces el valor de un atributo que se te pide que extraigas, puedes omitirlo"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.1,
+      "position": [
+        -2384,
+        192
+      ],
+      "id": "72cda718-2fe9-426d-911c-fa9e413377de",
+      "name": "Information Extractor1"
+    },
+    {
+      "parameters": {
+        "options": {
+          "summarizationMethodAndPrompts": {
+            "values": {
+              "combineMapPrompt": "=Historial laboral:  {{ $json.output[\"Historial laboral\"] }}\n\nHabilidades: {{ $json.output.Habilidades }}\n\nRedacta un resumen consiso con los siguientes datos:\nNombre: {{ $json.output.Nombre_candidato }}\nHabilidades: {{ $json.output.Habilidades }}\n\nLenguajes de programación que domina: {{ $json.output[\"Lenguajes de programación\"] }}\n{{ $json.output.Habilidades }}\nTelefono:{{ $json.output.Telefono }}\nSoftware que domina: {{ $json.output.Software }}",
+              "prompt": "=Historial laboral:  {{ $json.output[\"Historial laboral\"] }}\n\nHabilidades: {{ $json.output.Habilidades }}\n\nRedacta un resumen consiso con los siguientes datos:\nNombre: {{ $json.output.Nombre_candidato }}\nHabilidades: {{ $json.output.Habilidades }}\n\nLenguajes de programación que domina: {{ $json.output[\"Lenguajes de programación\"] }}\n{{ $json.output.Habilidades }}\nTelefono:{{ $json.output.Telefono }}\nSoftware que domina: {{ $json.output.Software }}\n\n\nCONCISE SUMMARY:"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "typeVersion": 2.1,
+      "position": [
+        -1808,
+        44
+      ],
+      "id": "7cbccbf3-4757-4b5c-bb9f-feb8fa5e9365",
+      "name": "Summarization Chain"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d94d01fb-f8bb-45fd-962f-7d817aeb2f70",
+              "name": "Perfil requerido:",
+              "value": "Una empresa de desarrollo de software busca a un programador full stack con sólidos conocimientos en tecnologías web, capaz de trabajar tanto en el frontend como en el backend. Se valorará la capacidad de aprender rápidamente, resolver problemas de forma eficiente y trabajar en equipo dentro de un entorno ágil.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1456,
+        44
+      ],
+      "id": "9956ddf4-05bc-4c46-b5b0-4d34432a3c6d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Perfil buscado: {{ $json[\"Perfil requerido:\"] }}\n\nCandidato:{{ $('Summarization Chain').item.json.output.text }}\n",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "Actúas como un especialista en Recursos Humanos encargado de evaluar si un candidato se ajusta al perfil requerido por la empresa. Debes otorgar una calificación del 1 al 10, donde:\n\n1 indica que el candidato no cumple en absoluto con los requisitos del puesto, y\n\n10 indica que el candidato cumple completamente con todas las expectativas y competencias requeridas.\n\nBasándote únicamente en la información proporcionada, emite tu evaluación e incluye una justificación clara y objetiva, destacando los puntos fuertes y, en caso de una baja puntuación, los motivos por los cuales el candidato no sería considerado apto para el puesto.\n\n"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        -1232,
+        44
+      ],
+      "id": "f60357ec-74a9-4f97-9130-a0fde1d93c11",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514",
+          "cachedResultName": "Claude 4 Sonnet"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        -1224,
+        268
+      ],
+      "id": "80115358-c1d4-4f36-86ef-af882ce8b2ef",
+      "name": "Anthropic Chat Model1"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"puntuación\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n\t\t\"Calificación\": {\n\t\t\t\"type\": \"String\"\t\t\t\n\t\t}\n\t}\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -1096,
+        268
+      ],
+      "id": "a9aad274-dbd6-4746-8bfd-1e5e381fdae5",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1JNPmJndmqPBUjX0Gq1eqD3cNkg8D2Vn0YY50jSUNprg",
+          "mode": "list",
+          "cachedResultName": "Candidatos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JNPmJndmqPBUjX0Gq1eqD3cNkg8D2Vn0YY50jSUNprg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JNPmJndmqPBUjX0Gq1eqD3cNkg8D2Vn0YY50jSUNprg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "calificacion": "={{ $json.output[\"puntuación\"] }}",
+            "consideraciones": "={{ $json.output[\"Calificación\"] }}",
+            "Software": "={{ $('Merge').item.json.output.Software }}",
+            "Lenguajes de programacion": "={{ $('Merge').item.json.output[\"Lenguajes de programación\"] }}",
+            "Habilidades": "={{ $('Merge').item.json.output.Habilidades }}",
+            "Historial laboral": "={{ $('Merge').item.json.output[\"Historial laboral\"] }}",
+            "Formacion academia": "={{ $('Merge').item.json.output[\"Formacion academia\"] }}",
+            "Telefono": "={{ $('Merge').item.json.output.Telefono }}",
+            "email": "={{ $('Merge').item.json.output.email }}",
+            "Nombre del candidato": "={{ $('Merge').item.json.output.email }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Nombre del candidato",
+              "displayName": "Nombre del candidato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Telefono",
+              "displayName": "Telefono",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Formacion academia",
+              "displayName": "Formacion academia",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Historial laboral",
+              "displayName": "Historial laboral",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Habilidades",
+              "displayName": "Habilidades",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lenguajes de programacion",
+              "displayName": "Lenguajes de programacion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Software",
+              "displayName": "Software",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "calificacion",
+              "displayName": "calificacion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "consideraciones",
+              "displayName": "consideraciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -880,
+        44
+      ],
+      "id": "5da13cba-0b79-4bd1-8f15-99722dcfc41b",
+      "name": "Google Sheets"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Information Extractor1",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Summarization Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Information Extractor1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Summarization Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarization Chain": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ea284464-8f30-4d81-be21-0c1545bcb363",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3fcc644d9e9b7920e96094707a8751586188d150285dff7512ebe15f04af2b87"
+  },
+  "id": "RZdp4nXlkq3DFs3d",
+  "tags": []
+}

@@ -1,5 +1,0 @@
-2025/09/28-15:43:16.168 9348 Reusing MANIFEST C:\Users\jair_\Desktop\nestWts\session\session\Default\Local Storage\leveldb/MANIFEST-000001
-2025/09/28-15:43:16.173 9348 Recovering log #4
-2025/09/28-15:43:16.173 9348 (ignoring error) C:\Users\jair_\Desktop\nestWts\session\session\Default\Local Storage\leveldb/000004.log: dropping 20944 bytes; Corruption: checksum mismatch
-2025/09/28-15:43:16.174 9348 (ignoring error) C:\Users\jair_\Desktop\nestWts\session\session\Default\Local Storage\leveldb/000004.log: dropping 423 bytes; Corruption: missing start of fragmented record(2)
-2025/09/28-15:43:16.178 9348 Reusing old log C:\Users\jair_\Desktop\nestWts\session\session\Default\Local Storage\leveldb/000004.log 
